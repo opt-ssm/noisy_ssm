@@ -1,6 +1,6 @@
-class ChatDataset(Dataset):
+class lo_dataset(Dataset):
     def __init__(self, file_path: str, tokenizer: transformers.AutoTokenizer):
-        super(ChatDataset, self).__init__()
+        super(lo_dataset, self).__init__()
         data_dict = preprocess_dataset(file_path, tokenizer)
 
         self.input_ids = data_dict["input_ids"]
@@ -14,7 +14,7 @@ class ChatDataset(Dataset):
 
 
 @dataclass
-class DataCollatorForChatDataset(object):
+class DataCollator(object):
     """
     Collate examples for supervised fine-tuning.
     """
@@ -33,8 +33,8 @@ class DataCollatorForChatDataset(object):
         )
     
 
-class ChatDataModule():
+class DataModule():
     def __init__(self, tokenizer: transformers.PreTrainedTokenizer, data_path: str):
 
-        self.dataset = ChatDataset(tokenizer=tokenizer, data_path=data_path)
-        self.data_collator = DataCollatorForChatDataset(tokenizer=tokenizer)
+        self.dataset = lo_dataset(tokenizer=tokenizer, data_path=data_path)
+        self.data_collator = DataCollator(tokenizer=tokenizer)
