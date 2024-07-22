@@ -1,5 +1,4 @@
 import tensorflow as tf
-import jax.numpy as jnp
 import numpy as np
 from transformers import AutoTokenizer
 
@@ -43,16 +42,3 @@ def preprocess_dataset(file_path, tokenizer, batch_size=256):
 
     return dict(input_ids=input_ids, labels=labels)
 
-class ChatDataset(Dataset):
-    def __init__(self, file_path: str, tokenizer: transformers.AutoTokenizer):
-        super(ChatDataset, self).__init__()
-        data_dict = preprocess_dataset(file_path, tokenizer)
-
-        self.input_ids = data_dict["input_ids"]
-        self.labels = data_dict["labels"]
-
-    def __len__(self):
-        return len(self.input_ids)
-
-    def __getitem__(self, i) -> Dict[str, torch.Tensor]:
-        return dict(input_ids=self.input_ids[i], labels=self.labels[i])

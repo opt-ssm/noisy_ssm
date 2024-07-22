@@ -1,6 +1,21 @@
-class ChatDataset(Dataset):
+from preprocess import preprocess
+import random
+from typing import Dict, Sequence
+from dataclasses import dataclass
+import torch
+from torch.utils.data import Dataset, Subset
+import transformers
+
+def get_random_subset(dataset: Dataset, n: int) -> Subset:
+    if n > len(dataset):
+        raise ValueError("Requested subset size is larger than the dataset.")
+    
+    indices = random.sample(range(len(dataset)), n)
+    return Subset(dataset, indices)
+
+class LongRangeDataset(Dataset):
     def __init__(self, file_path: str, tokenizer: transformers.AutoTokenizer):
-        super(ChatDataset, self).__init__()
+        super(LongRangeDataset, self).__init__()
         data_dict = preprocess_dataset(file_path, tokenizer)
 
         self.input_ids = data_dict["input_ids"]
@@ -14,7 +29,7 @@ class ChatDataset(Dataset):
 
 
 @dataclass
-class DataCollatorForChatDataset(object):
+class DataCollator(object):
     """
     Collate examples for supervised fine-tuning.
     """
@@ -33,8 +48,9 @@ class DataCollatorForChatDataset(object):
         )
     
 
-class ChatDataModule():
-    def __init__(self, tokenizer: transformers.PreTrainedTokenizer, data_path: str):
-
-        self.dataset = ChatDataset(tokenizer=tokenizer, data_path=data_path)
-        self.data_collator = DataCollatorForChatDataset(tokenizer=tokenizer)
+class DataModule():
+    def __init__(self, tokenizer: transformers.PreTrainedTokenizer, data_path: str, batch_size: int):
+        self.dataset = LongRangeDataset(tokenizer=tokenizer, data_path=data_path)
+        if subset_size is not None:
+            self.dataset = get_random_subset(self.dataset, subset_size)
+        self.data_collator = DataCollator(tokenizer=tokenizer)
