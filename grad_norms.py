@@ -2,11 +2,11 @@ import argparse
 
 import torch
 
-# from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
+from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
 from transformers import AutoTokenizer, TrainingArguments
 
 from trainer.data import ChatDataModule
-from trainer.mamba_trainer import MambaTrainer
+from trainer.trainer import MambaTrainer
 
 
 def run(args):

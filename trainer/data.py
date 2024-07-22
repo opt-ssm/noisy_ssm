@@ -3,7 +3,7 @@ from typing import Dict, Sequence
 import torch
 import transformers
 from datasets import Dataset
-
+from dataclasses import dataclass
 
 def preprocess_dataset(file_path, tokenizer):
     pass

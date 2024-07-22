@@ -17,8 +17,6 @@ class Constants:
     mamba_1_4b = "state-spaces/mamba-1.4b-hf"
     # Mamba 2 models
     mamba_2_4b = "state-spaces/mamba-1.4b-hf"
-    mamba_2_7b = "state-spaces/mamba2-2.7b"
-    mamba_2_7b_attn = "state-spaces/mamba2attn-2.7b"
     mamba_2_8b = "state-spaces/mamba-2.8b-hf"
 
 
