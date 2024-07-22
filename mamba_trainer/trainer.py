@@ -1,7 +1,7 @@
-from transformers import Trainer
+from transformers import Trainer, TrainerCallback
 import torch
 import os
-from trainer import preprocess
+from preprocess import preprocess
 
 
 class MambaTrainer(Trainer):
@@ -29,8 +29,8 @@ class MambaTrainer(Trainer):
 
 
 class GradientCallback(TrainerCallback):
-    def __init__(self, gradient_norms):
-        self.gradient_norm = gradient_norm
+    def __init__(self, gradient_norm):
+        self.gradient_norm = 0
 
     def on_step_end(self, args, state, control, **kwargs):
         model = kwargs['model']

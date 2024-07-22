@@ -11,7 +11,7 @@ def rename_close_brackets(x):
     source = tf.strings.regex_replace(source, r'\)', '')
     return {'Source': source, 'Target': x['Target']}
 
-def preprocess_dataset(file_path, tokenizer, batch_size=256):
+def preprocess(file_path, tokenizer, batch_size=256):
     """Preprocess dataset."""
     print(file_path)
     sel_cols = ['Source', 'Target']

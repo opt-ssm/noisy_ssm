@@ -3,31 +3,23 @@ import argparse
 import os
 from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
 from transformers import AutoTokenizer, TrainingArguments
-from trainer.data import DataModule
-from mamba_trainer.trainer import MambaTrainer, GradientCaptureCallback
+from mamba_trainer.data import DataModule
+from mamba_trainer.trainer import MambaTrainer, GradientCallback
 
 def run(args):
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(DEVICE)
 
-    model_directory = args.output_dir
-    model_file_path = os.path.join(model_directory, 'pytorch_model.bin')
-    if os.path.exists(model_file_path):
-        model = MambaLMHeadModel.from_pretrained(model_file_path, dtype=torch.bfloat16, device="cuda")
-        tokenizer = AutoTokenizer.from_pretrained(model_file_path)
-    else:
-        model = MambaLMHeadModel.from_pretrained(args.model, dtype=torch.bfloat16, device="cuda")
-        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
-        tokenizer.eos_token = "<|endoftext|>"
-        tokenizer.pad_token = tokenizer.eos_token
-        if not os.path.exists(model_directory):
-            os.makedirs(model_directory)
-        model.save_pretrained(model_directory)
-        tokenizer.save_pretrained(model_directory)
+    model = MambaLMHeadModel.from_pretrained(args.model, dtype=torch.bfloat16, device="cuda")
+    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
+    tokenizer.eos_token = "<|endoftext|>"
+    tokenizer.pad_token = tokenizer.eos_token
 
     optimizer = torch.optim.Adam(model.parameters(), amsgrad=True)
 
     data_module = DataModule(
         tokenizer=tokenizer,
-        data_path=args.data_path,
+        data_path=args.train_data,
         batch_size=args.batch_size
     )
 
@@ -69,8 +61,8 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=5e-5)
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
-    parser.add_argument("--train_data", type=str, default="./data/listops_500-1000/train_data.tsv")
-    parser.add_argument("--output_dir", type=str, default="./model")
+    parser.add_argument("--train_data", type=str, default="./data/listops_500-1000/train.tsv")
+    parser.add_argument("--output_dir", type=str, default="model")
     parser.add_argument("--num_epochs", type=int, default=1)
     args = parser.parse_args()
 

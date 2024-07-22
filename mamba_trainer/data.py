@@ -14,9 +14,9 @@ def get_random_subset(dataset: Dataset, n: int) -> Subset:
     return Subset(dataset, indices)
 
 class LongRangeDataset(Dataset):
-    def __init__(self, file_path: str, tokenizer: transformers.AutoTokenizer):
+    def __init__(self, data_path: str, tokenizer: transformers.AutoTokenizer):
         super(LongRangeDataset, self).__init__()
-        data_dict = preprocess_dataset(file_path, tokenizer)
+        data_dict = preprocess(data_path, tokenizer)
 
         self.input_ids = data_dict["input_ids"]
         self.labels = data_dict["labels"]
