@@ -1,26 +1,26 @@
-import torch
 import argparse
 
-#from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
+import torch
+
+# from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
 from transformers import AutoTokenizer, TrainingArguments
+
 from trainer.data import ChatDataModule
 from trainer.mamba_trainer import MambaTrainer
 
 
 def run(args):
-        
+
     model = MambaLMHeadModel.from_pretrained(args.model, dtype=torch.bfloat16, device="cuda")
 
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
     tokenizer.eos_token = "<|endoftext|>"
     tokenizer.pad_token = tokenizer.eos_token
 
-
     data_module = DataModule(
         tokenizer=tokenizer,
         data_path=args.data_path,
     )
-
 
     trainer = MambaTrainer(
         model=model,

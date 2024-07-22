@@ -1,6 +1,7 @@
-from transformers import Trainer
-import torch
 import os
+
+import torch
+from transformers import Trainer
 
 
 class MambaTrainer(Trainer):
@@ -20,6 +21,6 @@ class MambaTrainer(Trainer):
     def save_model(self, output_dir, _internal_call):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-            
+
         torch.save(self.model.state_dict(), f"{output_dir}/pytorch_model.bin")
         self.tokenizer.save_pretrained(output_dir)

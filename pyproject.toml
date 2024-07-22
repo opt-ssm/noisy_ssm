@@ -20,7 +20,7 @@ tensorflow = "^2.17.0"
 
 [tool.black]
 line-length = 119
-required-version = "22.4.2"
+required-version = "24.4.2"
 
 [tool.isort]
 profile = "black"
