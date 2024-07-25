@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import torch
 from transformers import AutoTokenizer
 
 AUTOTUNE = tf.data.AUTOTUNE
@@ -36,9 +37,9 @@ def preprocess(file_path, tokenizer, batch_size=256):
         target = item['Target'].numpy()
 
         tokenized_input = tokenizer(source, add_special_tokens = False)
-        input_ids.append(tokenized_input['input_ids'])
+        input_ids.append(torch.LongTensor(tokenized_input['input_ids']))
 
-        labels.append(target)
+        labels.append(torch.LongTensor(target))
 
     return dict(input_ids=input_ids, labels=labels)
 

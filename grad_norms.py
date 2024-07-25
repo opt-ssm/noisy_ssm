@@ -1,12 +1,25 @@
 import torch
 import argparse
 import os
+from numba import cuda
 from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
 from transformers import AutoTokenizer, TrainingArguments
 from mamba_trainer.data import DataModule
 from mamba_trainer.trainer import MambaTrainer, GradientCallback
 
+
+def print_selected_gpu(device_id):
+    gpu_name = torch.cuda.get_device_name(device_id)
+    gpu_memory = torch.cuda.get_device_properties(device_id).total_memory / 1024**3
+    print(f"Selected GPU {device_id}: {gpu_name}, Memory: {gpu_memory:.2f} GB")
+
 def run(args):
+    device_id=0
+    cuda.select_device(device_id)
+    print_selected_gpu(device_id)
+    cuda.close()
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(DEVICE)
 
@@ -20,15 +33,14 @@ def run(args):
     data_module = DataModule(
         tokenizer=tokenizer,
         data_path=args.train_data,
-        batch_size=args.batch_size
+        batch_size=64
     )
 
     training_args = TrainingArguments(
         learning_rate=args.learning_rate,
         num_train_epochs=1,
-        per_device_train_batch_size=args.batch_size,
+        per_device_train_batch_size=64,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
-        optim=optimizer,
         output_dir=args.output_dir,
         logging_dir="./logs", 
         logging_steps=1,
@@ -38,14 +50,15 @@ def run(args):
 
     gradient_norms = []
 
-    for step in range(t_total):
-        grad_callback = GradientCaptureCallback()
+    for step in range(1000):
+        grad_callback = GradientCallback()
 
         trainer = MambaTrainer(
             model=model,
             train_dataset=data_module.dataset,
             tokenizer=tokenizer,
             args=training_args,
+            optimizers=(optimizer, None),
             data_collator=data_module.data_collator,
             callbacks=[grad_callback]
         )
