@@ -6,7 +6,6 @@ from mamba_trainer.preprocess import preprocess
 import logging
 from transformers import TrainerCallback, TrainerState, TrainerControl, TrainingArguments
 
-# Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
