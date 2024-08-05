@@ -6,12 +6,6 @@ import torch
 from torch.utils.data import Dataset, Subset
 import transformers
 
-def get_random_subset(dataset: Dataset, n: int) -> Subset:
-    if n > len(dataset):
-        raise ValueError("Requested subset size is larger than the dataset.")
-    
-    indices = random.sample(range(len(dataset)), n)
-    return Subset(dataset, indices)
 
 class LongRangeDataset(Dataset):
     def __init__(self, data_path: str, tokenizer: transformers.AutoTokenizer):
@@ -49,8 +43,6 @@ class DataCollator(object):
     
 
 class DataModule():
-    def __init__(self, tokenizer: transformers.PreTrainedTokenizer, data_path: str, batch_size: int):
+    def __init__(self, tokenizer: transformers.PreTrainedTokenizer, data_path: str):
         self.dataset = LongRangeDataset(tokenizer=tokenizer, data_path=data_path)
-        if batch_size is not None:
-            self.dataset = get_random_subset(self.dataset, batch_size)
         self.data_collator = DataCollator(tokenizer=tokenizer)

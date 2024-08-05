@@ -1,29 +1,20 @@
+import os
+os.environ["CUDA_DEVICE_ORDER"]='PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2, 4'
+
+
 import torch
 import argparse
-import os
-from numba import cuda
+#from numba import cuda
 from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
-from transformers import AutoTokenizer, TrainingArguments
+from transformers import AutoTokenizer, TrainingArguments, AutoModelForCausalLM
 from mamba_trainer.data import DataModule
 from mamba_trainer.trainer import MambaTrainer, GradientCallback
 
 
-def print_selected_gpu(device_id):
-    gpu_name = torch.cuda.get_device_name(device_id)
-    gpu_memory = torch.cuda.get_device_properties(device_id).total_memory / 1024**3
-    print(f"Selected GPU {device_id}: {gpu_name}, Memory: {gpu_memory:.2f} GB")
-
 def run(args):
-    device_id=0
-    cuda.select_device(device_id)
-    print_selected_gpu(device_id)
-    cuda.close()
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(DEVICE)
-
-    model = MambaLMHeadModel.from_pretrained(args.model, dtype=torch.bfloat16, device="cuda")
+    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.bfloat16, device="cuda")
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
     tokenizer.eos_token = "<|endoftext|>"
     tokenizer.pad_token = tokenizer.eos_token
@@ -33,13 +24,13 @@ def run(args):
     data_module = DataModule(
         tokenizer=tokenizer,
         data_path=args.train_data,
-        batch_size=64
+        batch_size=8
     )
 
     training_args = TrainingArguments(
         learning_rate=args.learning_rate,
         num_train_epochs=1,
-        per_device_train_batch_size=64,
+        per_device_train_batch_size=8,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         output_dir=args.output_dir,
         logging_dir="./logs", 
@@ -69,8 +60,8 @@ def run(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="state-spaces/mamba-1.4b")
-    parser.add_argument("--tokenizer", type=str, default="EleutherAI/gpt-neox-20b")
+    parser.add_argument("--model", type=str, default="state-spaces/mamba-130m-hf")
+    parser.add_argument("--tokenizer", type=str, default="state-spaces/mamba-130m-hf")
     parser.add_argument("--learning_rate", type=float, default=5e-5)
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
