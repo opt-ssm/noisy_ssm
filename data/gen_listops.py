@@ -147,13 +147,13 @@ def main(args):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Generate ListOps dataset.')
   parser.add_argument('--task', default='basic', help='Name of task to create.')
-  parser.add_argument('--num_train_samples', type=int, default=96000, help='Number of train samples.')
+  parser.add_argument('--num_train_samples', type=int, default=10000, help='Number of train samples.')
   parser.add_argument('--num_valid_samples', type=int, default=2000, help='Number of valid samples.')
   parser.add_argument('--num_test_samples', type=int, default=2000, help='Number of test samples.')
   parser.add_argument('--max_depth', type=int, default=10, help='Maximum tree depth of training sequences.')
   parser.add_argument('--max_args', type=int, default=10, help='Maximum number of arguments per operator in training sequences.')
-  parser.add_argument('--max_length', type=int, default=2000, help='Maximum length per sequence in training sequences.')
-  parser.add_argument('--min_length', type=int, default=500, help='Minimum length per sequence in training sequences.')
+  parser.add_argument('--max_length', type=int, default=150, help='Maximum length per sequence in training sequences.')
+  parser.add_argument('--min_length', type=int, default=50, help='Minimum length per sequence in training sequences.')
 
   args = parser.parse_args()
   main(args)

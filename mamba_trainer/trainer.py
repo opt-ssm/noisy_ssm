@@ -76,6 +76,7 @@ class GradientCallback(TrainerCallback):
     def get_grad_hook(self):
         def hook(grad):
             grad_norm = grad.data.norm(2)
+            print(f"Type of self.gradients before appending: {type(self.gradients)}")
             self.gradients.append(grad.detach().reshape(-1).clone())
             self.total_norm += grad_norm.item() ** 2
         return hook
